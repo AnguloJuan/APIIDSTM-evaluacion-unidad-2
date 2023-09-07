@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bomberman</title>
+</head>
+
+<body>
+    <canvas id="myCanvas" width="1250px" height="650px" style="border:1px solid #000000;">
+        Your browser does not support the canvas tag.
+    </canvas>
+</body>
+<script>
+    //dibujo de cuadrados
+    let canvas = document.getElementById("myCanvas");
+    let ctx = canvas.getContext("2d");
+    ctx.strokeStyle = "#000";
+    var player, goal;
+    var walls = [];
+    var dir;
+    var time = 0;
+    var pause = false;
+    var speed = 10;
+    var audio = new Audio;
+    audio.src = './minecraft-subir-nivel.mp3';
+    var xpBall = new Image;
+    var steve = new Image;
+    var bedrock = new Image;
+    var stone = new Image;
+    xpBall.src = './minecraft_xp_ball.webp';
+    steve.src = './minecraft-steve-head.jpg';
+    bedrock.src = './bedrock.webp';
+    stone.src = './stone.jpeg';
+
+
+    class Rectangule {
+        constructor(x, y, w, h, c, img) {
+            this.x = x;
+            this.y = y;
+            this.w = w;
+            this.h = h;
+            this.c = c;
+            this.img = img;
+        }
+
+        repaintRect() {
+            ctx.beginPath();
+            if (!this.img) {
+                ctx.beginPath();
+                ctx.fillStyle = this.c ? this.c : "#555";
+                ctx.fillRect(this.x, this.y, this.w, this.h);
+                ctx.strokeRect(this.x, this.y, this.w, this.h);
+                ctx.closePath();
+            } else {
+                ctx.beginPath();
+                ctx.drawImage(this.img, this.x, this.y, this.w, this.h);
+                ctx.closePath();
+            }
+        }
+
+        collision(rect) {
+            switch (dir) {
+                case 38://bottom
+                    player.y = rect.y + rect.h;
+                    break;
+                case 37://left
+                    player.x = rect.x + rect.w;
+                    break;
+                case 40://top
+                    player.y = rect.y - 40;
+                    break;
+                case 39://right
+                    player.x = rect.x - 40;
+                    break;
+            }
+            dir = 0;
+        }
+
+        goal() {
+            player.c = goal.c;
+            audio.play();
+        }
+    }
+
+    player = new Rectangule(250, 150, 40, 40, null, steve);
+    goal = new Rectangule(450, 200, 50, 50, null, xpBall);
+    //bedrock wall
+    for (let j = 0; j < 13; j++) {
+        for (let i = 0; i < 25; i++) {
+            if (j == 0 || j == 12) {
+                walls.push(new Rectangule(0 + i * 50, 0 + j * 50, 50, 50, null, bedrock));
+            } else {
+                if (i == 0 || i == 24) {
+                    walls.push(new Rectangule(0 + i * 50, 0 + j * 50, 50, 50, null, bedrock));
+                }
+            }
+        }
+    }
+    //stones
+    for (let j = 0; j < 5; j++) {
+        for (let i = 0; i < 11; i++) {
+            walls.push(new Rectangule(100 + i * 100, 100 + j * 100, 50, 50, null, stone));
+        }
+    }
+
+    document.addEventListener("keydown", (e) => {
+        switch (event.keyCode) {
+            case 38://up
+                if (!pause) {
+                    player.y -= speed;
+                    dir = event.keyCode;
+                }
+                break;
+            case 37://left
+                if (!pause) {
+                    player.x -= speed;
+                    dir = event.keyCode;
+                }
+                break;
+            case 40://down
+                if (!pause) {
+                    player.y += speed;
+                    dir = event.keyCode;
+                }
+                break;
+            case 39://right
+                if (!pause) {
+                    player.x += speed;
+                    dir = event.keyCode;
+                }
+                break;
+            case 27://pause-esc
+                pause = !pause;
+                //pause screen
+                ctx.beginPath();
+                ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+                ctx.fillRect(0, 0, 1200, 600);
+                ctx.closePath();
+
+                ctx.beginPath();
+                ctx.font = "40px Segoe UI, Tahoma, Geneva, Verdana, sans-serif";
+                ctx.fillStyle = "#fff"
+                ctx.fillText("Game menu", 450, 260);
+                ctx.font = "20px Segoe UI";
+                ctx.fillText("Esc Back to the game", 420, 300);
+                ctx.closePath();
+                break;
+        }
+    });
+
+    function update() {
+        if (!pause) {
+            repaint();
+
+            if (player.x < goal.x + goal.w && player.x + player.w > goal.x && player.y < goal.y + goal.h && player.y + player.h > goal.y) {
+                player.goal();
+            }
+
+            player.repaintRect();
+            goal.repaintRect();
+
+            walls.forEach(rect => {
+                if (player.x < rect.x + rect.w && player.x + player.w > rect.x && player.y < rect.y + rect.h && player.y + player.h > rect.y) {
+                    rect.collision(rect);
+                }
+                rect.repaintRect();
+            });
+        }
+
+        window.requestAnimationFrame(update);
+    }
+
+    function repaint() {
+        //blank canvas
+        ctx.beginPath();
+        ctx.fillStyle = "rgb(255, 255, 255)";
+        ctx.fillRect(0, 0, 1000, 600);
+        ctx.closePath();
+
+        //paint timer
+        ctx.beginPath();
+        ctx.font = "20px Segoe UI, Tahoma, Geneva, Verdana, sans-serif";
+        ctx.fillStyle = "#000"
+        ctx.fillText("Time remaining: " + time, 0, 18);
+        ctx.fillText("Press Esc to pause", 830, 18);
+        ctx.closePath();
+    }
+
+    function timer() {
+        var timer = setInterval(function () {
+            time--;
+            if (time < 0) {
+                clearInterval(timer);
+            }
+        }, 1000);
+    }
+
+
+    window.requestAnimationFrame = (function () {
+        return window.requestAnimationFrame ||
+            window.webkitRequestAnimationFrame ||
+            window.mozRequestAnimationFrame ||
+            function (callback) {
+                window.setTimeout(callback, 60);
+            };
+    }());
+
+    window.requestAnimationFrame(update);
+</script>
+
+</html>
