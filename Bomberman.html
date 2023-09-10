@@ -8,21 +8,22 @@
 </head>
 
 <body>
-    <canvas id="myCanvas" width="1250px" height="650px" style="border:1px solid #000000;">
+    <canvas id="myCanvas" width="1150px" height="650px" style="border:1px solid #000000;">
         Your browser does not support the canvas tag.
     </canvas>
 </body>
 <script>
-    //dibujo de cuadrados
     let canvas = document.getElementById("myCanvas");
     let ctx = canvas.getContext("2d");
     ctx.strokeStyle = "#000";
     var player, goal;
     var walls = [];
     var dir;
-    var time = 0;
+    var time = 120;
+    var minutes, seconds, timeFormat;
     var pause = false;
-    var speed = 10;
+    var speed = 20;
+
     var audio = new Audio;
     audio.src = './minecraft-subir-nivel.mp3';
     var xpBall = new Image;
@@ -84,15 +85,53 @@
         }
     }
 
+
+    class Paints {
+        blank() {
+            ctx.beginPath();
+            ctx.fillStyle = "rgb(255, 255, 255)";
+            ctx.fillRect(0, 0, 1150, 650);
+            ctx.closePath();
+        }
+
+        pauseScreen() {
+            ctx.beginPath();
+            ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+            ctx.fillRect(0, 0, 1150, 650);
+            ctx.closePath();
+
+            ctx.beginPath();
+            ctx.font = "40px Segoe UI, Tahoma, Geneva, Verdana, sans-serif";
+            ctx.fillStyle = "#fff"
+            ctx.fillText("Game menu", 450, 260);
+            ctx.font = "20px Segoe UI";
+            ctx.fillText("Esc Back to the game", 420, 300);
+            ctx.closePath();
+        }
+
+        timer() {
+            minutes = Math.floor(time / 60);
+            seconds = time % 60;
+            timeFormat = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0').substr(0, 2)}`
+            ctx.beginPath();
+            ctx.font = "20px Segoe UI, Tahoma, Geneva, Verdana, sans-serif";
+            ctx.fillStyle = "#fff";
+            ctx.fillText("Time remaining: " + timeFormat, 50, 22);
+            ctx.fillText("Press Esc to pause", 930, 22);
+            ctx.closePath();
+        }
+    }
+    const paints = new Paints;
+
     player = new Rectangule(250, 150, 40, 40, null, steve);
     goal = new Rectangule(450, 200, 50, 50, null, xpBall);
     //bedrock wall
     for (let j = 0; j < 13; j++) {
-        for (let i = 0; i < 25; i++) {
+        for (let i = 0; i < 24; i++) {
             if (j == 0 || j == 12) {
                 walls.push(new Rectangule(0 + i * 50, 0 + j * 50, 50, 50, null, bedrock));
             } else {
-                if (i == 0 || i == 24) {
+                if (i == 0 || i == 22) {
                     walls.push(new Rectangule(0 + i * 50, 0 + j * 50, 50, 50, null, bedrock));
                 }
             }
@@ -100,7 +139,7 @@
     }
     //stones
     for (let j = 0; j < 5; j++) {
-        for (let i = 0; i < 11; i++) {
+        for (let i = 0; i < 10; i++) {
             walls.push(new Rectangule(100 + i * 100, 100 + j * 100, 50, 50, null, stone));
         }
     }
@@ -132,27 +171,27 @@
                 }
                 break;
             case 27://pause-esc
-                pause = !pause;
-                //pause screen
-                ctx.beginPath();
-                ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
-                ctx.fillRect(0, 0, 1200, 600);
-                ctx.closePath();
-
-                ctx.beginPath();
-                ctx.font = "40px Segoe UI, Tahoma, Geneva, Verdana, sans-serif";
-                ctx.fillStyle = "#fff"
-                ctx.fillText("Game menu", 450, 260);
-                ctx.font = "20px Segoe UI";
-                ctx.fillText("Esc Back to the game", 420, 300);
-                ctx.closePath();
+                if (time != 0) {
+                    pause = !pause;
+                    if (!pause) {
+                        timer = setInterval(function () {
+                            time--;
+                            if (time == 0) {
+                                clearInterval(timer);
+                            }
+                        }, 1000)
+                    } else {
+                        clearInterval(timer);
+                    }
+                    paints.pauseScreen();
+                }
                 break;
         }
     });
 
     function update() {
         if (!pause) {
-            repaint();
+            paints.blank();
 
             if (player.x < goal.x + goal.w && player.x + player.w > goal.x && player.y < goal.y + goal.h && player.y + player.h > goal.y) {
                 player.goal();
@@ -167,36 +206,18 @@
                 }
                 rect.repaintRect();
             });
+            paints.timer();
         }
 
         window.requestAnimationFrame(update);
     }
 
-    function repaint() {
-        //blank canvas
-        ctx.beginPath();
-        ctx.fillStyle = "rgb(255, 255, 255)";
-        ctx.fillRect(0, 0, 1000, 600);
-        ctx.closePath();
-
-        //paint timer
-        ctx.beginPath();
-        ctx.font = "20px Segoe UI, Tahoma, Geneva, Verdana, sans-serif";
-        ctx.fillStyle = "#000"
-        ctx.fillText("Time remaining: " + time, 0, 18);
-        ctx.fillText("Press Esc to pause", 830, 18);
-        ctx.closePath();
-    }
-
-    function timer() {
-        var timer = setInterval(function () {
-            time--;
-            if (time < 0) {
-                clearInterval(timer);
-            }
-        }, 1000);
-    }
-
+    var timer = setInterval(function () {
+        time--;
+        if (time <= 0) {
+            clearInterval(timer);
+        }
+    }, 1000);
 
     window.requestAnimationFrame = (function () {
         return window.requestAnimationFrame ||
