@@ -38,6 +38,11 @@
 
     var audio = new Audio;
     audio.src = './minecraft-subir-nivel.mp3';
+    var xpWin = new Audio;
+    xpWin.src = './minecraft-subir-nivel.mp3';
+    var tntExplosion = new Audio;
+    tntExplosion.src = './minecraft-tnt-explosion.mp3';
+
     var xpBall = new Image;
     var steve = new Image;
     var bedrock = new Image;
@@ -51,15 +56,15 @@
     stone.src = './stone.jpeg';
     tnt.src = './minecraft-tnt.png';
 
-
     class Rectangule {
-        constructor(x, y, w, h, c, img) {
+        constructor(x, y, w, h, c, img, destroyed = false) {
             this.x = x;
             this.y = y;
             this.w = w;
             this.h = h;
             this.c = c;
             this.img = img;
+            this.destroyed = destroyed;
         }
 
         repaintRect() {
@@ -97,7 +102,7 @@
 
         goal() {
             player.c = goal.c;
-            audio.play();
+            xpWin.play();
             clearInterval(timer);
             win = true;
             paints.winScreen();
@@ -105,27 +110,30 @@
     }
 
     class Bomb {
-        constructor(x, y, w, h, c, img) {
+        constructor(x, y, img) {
             this.x = x;
             this.y = y;
-            this.w = w;
-            this.h = h;
-            this.c = c;
+            this.w = 40;
+            this.h = 40;
             this.img = img;
-            this.explode = 4;
+
+            this.explodeIn = 5;
             this.timeBomb = setInterval(function () {
-                this.explode--;
-                console.log(this.explode);
-                if (this.explode <= 0) {
+                this.explodeIn--;
+                if (this.explodeIn == 1) {
+                    this.explosion();
+                }
+                if (this.explodeIn <= 0) {
                     bombs.shift();
                     clearInterval(this.timeBomb);
 
                 }
             }.bind(this), 1000);
+            tntExplosion.play();
         }
 
         repaintRect() {
-            if (!(this.explode <= 1)) {
+            if (!(this.explodeIn <= 1)) {
                 //bomb
                 ctx.beginPath();
                 if (!this.img) {
@@ -143,15 +151,19 @@
                 //explosion
                 ctx.beginPath();
                 ctx.fillStyle = "#f00"
-                ctx.fillRect(this.x - 50, this.y, 140, 40);
                 ctx.fillRect(this.x, this.y - 50, 40, 140);
+                ctx.fillRect(this.x - 50, this.y, 140, 40);
                 ctx.closePath();
             }
         }
         explosion() {
+            //destroy stone for explosion
             stones.forEach(stone => {
-                if (player.x < rect.x + rect.w && player.x + player.w > rect.x && player.y < rect.y + rect.h && player.y + player.h > rect.y) {
-
+                if ((this.x < stone.x + stone.w || this.x - 50 < stone.x + stone.w) &&
+                    (this.x + 40 > stone.x || this.x - 50 + 140 > stone.x) &&
+                    (this.y < stone.y + stone.h || this.y - 50 < stone.y + stone.h) &&
+                    (this.y + 40 > stone.y || this.y - 50 + 140 > stone.y)) {
+                    stone.destroyed = true;
                 }
             });
         }
@@ -253,9 +265,7 @@
         }
     }
 
-
     document.addEventListener("keydown", (e) => {
-        console.log(e.keyCode);
         switch (event.keyCode) {
             case 38://up
                 if (!pause) {
@@ -285,9 +295,9 @@
                     if (player.y >= 600) { player.y = 560 }
                 }
                 break;
-            case 65://a-bombs
+            case 65://"a"-place-bombs
                 if (!bombs.length == 1) {
-                    bombs.push(new Bomb(player.x, player.y, 40, 40, "#f00", tnt));
+                    bombs.push(new Bomb(player.x, player.y, tnt));
                 }
                 break;
             case 27://pause-esc
@@ -314,28 +324,32 @@
     });
 
     function update() {
+        //colisions and repaints
         if (!pause && time != 0 && !win) {
             paints.blank();
             bombs.forEach(bomb => {
                 bomb.repaintRect();
             });
 
-            walls.forEach(rect => {
-                if (player.x < rect.x + rect.w && player.x + player.w > rect.x && player.y < rect.y + rect.h && player.y + player.h > rect.y) {
-                    rect.collision(rect);
+            stones.forEach(stone => {
+                if (!stone.destroyed) {
+                    if (player.x < stone.x + stone.w && player.x + player.w > stone.x && player.y < stone.y + stone.h && player.y + player.h > stone.y) {
+                        stone.collision(stone);
+                    }
+                    stone.repaintRect();
                 }
-                rect.repaintRect();
             });
-            stones.forEach(rect => {
-                if (player.x < rect.x + rect.w && player.x + player.w > rect.x && player.y < rect.y + rect.h && player.y + player.h > rect.y) {
-                    rect.collision(rect);
+            walls.forEach(wall => {
+                if (player.x < wall.x + wall.w && player.x + player.w > wall.x && player.y < wall.y + wall.h && player.y + player.h > wall.y) {
+                    wall.collision(wall);
                 }
-                rect.repaintRect();
+                wall.repaintRect();
             });
+
             paints.timer();
+            goal.repaintRect();
             player.repaintRect();
 
-            goal.repaintRect();
             if (player.x < goal.x + goal.w && player.x + player.w > goal.x && player.y < goal.y + goal.h && player.y + player.h > goal.y) {
                 player.goal();
             }
