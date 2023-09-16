@@ -1,5 +1,6 @@
 html {
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     box-sizing: border-box;
 }
 
@@ -34,4 +35,32 @@ button:disabled {
     background: rgb(41, 41, 133);
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.game {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    flex: 1;
+}
+
+.controls {
+    align-self: baseline;
+}
+
+.control{
+    display: flex;
+    gap: 4px;
+}
+
+.keyImg {
+    height: 36px;
+    align-self: center;
+}
+
+#myCanvas {
+    border: 1px solid #000000;
+    width: 75%;
+    align-self: self-end;
 }

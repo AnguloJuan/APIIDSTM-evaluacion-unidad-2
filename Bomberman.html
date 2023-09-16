@@ -10,9 +10,37 @@
 
 <body>
     <button id="start" type="button">Start Game</button>
-    <canvas id="myCanvas" width="1150px" height="650px" style="border:1px solid #000000;">
-        Your browser does not support the canvas tag.
-    </canvas>
+    <div class="game">
+        <div class="controls">
+            <h2>Your Goal</h2>
+            <div class="control">
+                <img src="./images/minecraft_xp_ball.webp" alt="arrow keys" class="keyImg">
+                <p class="">Reach the xp ball</p>
+            </div>
+            
+            <h2>Controls</h2>
+            <div class="control">
+                <img src="./images/pc-keyboard-arrow-keys-linear-icon-isolated-on-white-background-free-vector.jpg"
+                    alt="arrow keys" class="keyImg">
+                <p class="">Arrow Keys to move</p>
+            </div>
+            <div class="control">
+                <img src="./images/letter_a.png" alt="arrow keys" class="keyImg">
+                <p class="">Space to place bomb</p>
+            </div>
+            <div class="control">
+                <img src="./images/esc-key.png" alt="arrow keys" class="keyImg">
+                <p class="">Esc to pause</p>
+            </div>
+            <div class="control">
+                <img src="./images/letter_r.png" alt="arrow keys" class="keyImg">
+                <p class="">R to restart</p>
+            </div>
+        </div>
+        <canvas id="myCanvas" width="920px" height="520px">
+            Your browser does not support the canvas tag.
+        </canvas>
+    </div>
 </body>
 
 <script src="js/index.js" type="module"></script>
