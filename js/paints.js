@@ -1,59 +1,60 @@
 let canvas = document.getElementById("myCanvas");
 let ctx = canvas.getContext("2d");
 ctx.strokeStyle = "#000";
+let canvasW = canvas.width;
+let canvasH = canvas.height;
 
 let paints = {
     blank() {
         ctx.beginPath();
         ctx.fillStyle = "rgb(255, 255, 255)";
-        ctx.fillRect(0, 0, 1150, 650);
+        ctx.fillRect(0, 0, canvasW, canvasH);
         ctx.closePath();
     },
 
     pauseScreen() {
         ctx.beginPath();
         ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
-        ctx.fillRect(0, 0, 1150, 650);
+        ctx.fillRect(0, 0, canvasW, canvasH);
         ctx.closePath();
 
         ctx.beginPath();
         ctx.font = "40px Segoe UI, Tahoma, Geneva, Verdana, sans-serif";
         ctx.fillStyle = "#fff"
-        ctx.fillText("Game menu", 450, 260);
+        ctx.fillText("Game menu", canvasW / 2 - 100, canvasH / 2 - 50);
         ctx.font = "20px Segoe UI";
-        ctx.fillText("Esc Back to the game", 420, 300);
+        ctx.fillText("Esc Back to the game", canvasW / 2 - 84, canvasH / 2);
         ctx.closePath();
     },
 
     winScreen() {
         ctx.beginPath();
         ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
-        ctx.fillRect(0, 0, 1150, 650);
+        ctx.fillRect(0, 0, canvasW, canvasH);
         ctx.closePath();
 
         ctx.beginPath();
         ctx.font = "40px Segoe UI, Tahoma, Geneva, Verdana, sans-serif";
         ctx.fillStyle = "#fff"
-        ctx.fillText("You Win", 450, 260);
+        ctx.fillText("You Win", canvasW / 2 - 100, canvasH / 2 - 50);
         ctx.font = "20px Segoe UI";
-        ctx.fillText("Press R to play again", 420, 300);
+        ctx.fillText("Press R to play again", canvasW / 2 - 115, canvasH / 2);
         ctx.closePath();
     },
 
     gameOverScreen(time) {
         ctx.beginPath();
         ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
-        ctx.fillRect(0, 0, 1150, 650);
+        ctx.fillRect(0, 0, canvasW, canvasH);
         ctx.closePath();
 
         ctx.beginPath();
         ctx.font = "40px Segoe UI, Tahoma, Geneva, Verdana, sans-serif";
         ctx.fillStyle = "#fff"
-        ctx.fillText("Game over", 450, 260);
+        ctx.fillText("Game over", canvasW / 2 - 100, canvasH / 2 - 50);
         ctx.font = "20px Segoe UI";
-        time == 0 ? ctx.fillText("Time's up", 500, 300) :
-            ctx.fillText("You died", 500, 300);
-        ctx.fillText("Press R to reload page", 450, 350);
+        time == 0 ? ctx.fillText("Time's up", canvasW / 2 - 60, canvasH / 2 - 20) : ctx.fillText("You died", canvasW / 2 - 60, canvasH / 2 - 20);
+        ctx.fillText("Press R to reload page", canvasW / 2 - 110, canvasH / 2 + 10);
         ctx.closePath();
     },
 
@@ -62,10 +63,12 @@ let paints = {
         seconds = time % 60;
         timeFormat = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0').substr(0, 2)}`
         ctx.beginPath();
+        ctx.fillStyle = "#6F6F6F";
+        ctx.fillRect(0, 0, 250, 30);
+        ctx.strokeRect(0, 0, 250, 30);
         ctx.font = "20px Segoe UI, Tahoma, Geneva, Verdana, sans-serif";
         ctx.fillStyle = "#fff";
-        ctx.fillText("Time remaining: " + timeFormat, 50, 22);
-        ctx.fillText("Press Esc to pause", 930, 22);
+        ctx.fillText("Time remaining: " + timeFormat, 20, 22);
         ctx.closePath();
     },
 
