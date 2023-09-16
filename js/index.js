@@ -10,6 +10,7 @@ function start() {
     let bombs = []
     let pause = false;
     let win = false;
+    let blockSize = 40;
 
     let time = 120;
     let minutes, seconds, timeFormat;
@@ -66,10 +67,10 @@ function start() {
                     player.x = rect.x + rect.w;
                     break;
                 case 40://top
-                    player.y = rect.y - 40;
+                    player.y = rect.y - player.h;
                     break;
                 case 39://right
-                    player.x = rect.x - 40;
+                    player.x = rect.x - player.h;
                     break;
             }
             dir = 0;
@@ -88,8 +89,8 @@ function start() {
         constructor(x, y, img) {
             this.x = x;
             this.y = y;
-            this.w = 40;
-            this.h = 40;
+            this.w = blockSize - 10;
+            this.h = blockSize - 10;
             this.img = img;
 
             this.explodeIn = 5;
@@ -111,7 +112,7 @@ function start() {
             if (!(this.explodeIn <= 1)) {
                 paints.bomb(this.img, this.x, this.y, this.w, this.h);
             } else {
-                paints.explosion(this.x, this.y, this.w, this.h);
+                paints.explosion(this.x, this.y, blockSize);
             }
         }
 
@@ -120,30 +121,30 @@ function start() {
             stones.forEach(stone => {
                 if (//check rect 1
                     (this.x < stone.x + stone.w &&
-                        this.x + 40 > stone.x &&
-                        this.y - 50 < stone.y + stone.h &&
-                        this.y - 50 + 140 > stone.y) ||
+                        this.x + (blockSize - 10) > stone.x &&
+                        this.y - blockSize < stone.y + stone.h &&
+                        this.y - blockSize + (blockSize * 3 - 10) > stone.y) ||
                     //check rect 2
-                    (this.x - 50 < stone.x + stone.w &&
-                        this.x - 50 + 140 > stone.x &&
+                    (this.x - blockSize < stone.x + stone.w &&
+                        this.x - blockSize + (blockSize * 3 - 10) > stone.x &&
                         this.y < stone.y + stone.h &&
-                        this.y + 40 > stone.y)) {
+                        this.y + (blockSize - 10) > stone.y)) {
                     stone.destroyed = true;
                 }
             });
         }
     }
 
-    player = new Rectangule(50, 50, 40, 40, null, steve);
-    goal = new Rectangule(950, 450, 50, 50, null, xpBall);
+    player = new Rectangule(blockSize, blockSize, blockSize - 10, blockSize - 10, null, steve);
+    goal = new Rectangule((blockSize * 19), (blockSize * 9), blockSize, blockSize, null, xpBall);
     //bedrock wall
     for (let j = 0; j < 13; j++) {
-        for (let i = 0; i < 24; i++) {
+        for (let i = 0; i < 23; i++) {
             if (j == 0 || j == 12) {
-                walls.push(new Rectangule(0 + i * 50, 0 + j * 50, 50, 50, null, bedrock));
+                walls.push(new Rectangule(0 + i * blockSize, 0 + j * blockSize, blockSize, blockSize, null, bedrock));
             } else {
                 if (i == 0 || i == 22) {
-                    walls.push(new Rectangule(0 + i * 50, 0 + j * 50, 50, 50, null, bedrock));
+                    walls.push(new Rectangule(0 + i * blockSize, 0 + j * blockSize, blockSize, blockSize, null, bedrock));
                 }
             }
         }
@@ -151,7 +152,7 @@ function start() {
     //obsidian walls
     for (let j = 0; j < 5; j++) {
         for (let i = 0; i < 10; i++) {
-            walls.push(new Rectangule(100 + i * 100, 100 + j * 100, 50, 50, null, obsidian));
+            walls.push(new Rectangule((blockSize * 2) + i * (blockSize * 2), (blockSize * 2) + j * (blockSize * 2), blockSize, blockSize, null, obsidian));
         }
     }
 
@@ -160,8 +161,8 @@ function start() {
         for (let j = 0; j < 11; j++) {
             for (let i = 0; i < 21; i++) {
                 if ((i != 0 || j != 0) && (i != 1 || j != 0) && (i != 0 || j != 1) && (i != 18 || j != 8) && //exlude stones
-                Math.round(Math.random()) == 1) {//random stones
-                    stones.push(new Rectangule(50 + i * 50, 50 + j * 50, 50, 50, null, stone));
+                    Math.round(Math.random()) == 1) {//random stones
+                    stones.push(new Rectangule(blockSize + i * blockSize, blockSize + j * blockSize, blockSize, blockSize, null, stone));
                 }
             }
         }
@@ -174,14 +175,14 @@ function start() {
                 if (!pause) {
                     player.y -= speed;
                     dir = e.keyCode;
-                    if (player.y <= 50) { player.y = 50 }
+                    if (player.y <= blockSize) { player.y = blockSize }
                 }
                 break;
             case 37://left
                 if (!pause) {
                     player.x -= speed;
                     dir = e.keyCode;
-                    if (player.x <= 50) { player.x = 50 }
+                    if (player.x <= blockSize) { player.x = blockSize }
                 }
                 break;
             case 40://down
@@ -222,8 +223,8 @@ function start() {
                 break;
             case 82://"r"-restart
                 if (win) { win = false; }
-                player.x = 50;
-                player.y = 50;
+                player.x = blockSize;
+                player.y = blockSize;
                 bg.currentTime = 0;
                 time = 120;
                 stones = [];

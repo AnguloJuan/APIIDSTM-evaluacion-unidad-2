@@ -80,11 +80,11 @@ let paints = {
         ctx.drawImage(img, x, y, w, h);
         ctx.closePath();
     },
-    explosion(x, y) {
+    explosion(x, y, blockSize) {
         ctx.beginPath();
         ctx.fillStyle = "#f00"
-        ctx.fillRect(x, y - 50, 40, 140);
-        ctx.fillRect(x - 50, y, 140, 40);
+        ctx.fillRect(x, y - blockSize + 10, blockSize - 10, blockSize * 3 - 30);
+        ctx.fillRect(x - blockSize + 10, y, blockSize * 3 - 30, blockSize - 10);
         ctx.closePath();
     }
 }
