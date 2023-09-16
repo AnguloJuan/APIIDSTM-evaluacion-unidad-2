@@ -200,7 +200,7 @@ function start() {
                 }
                 break;
             case 65://"a"-place-bombs
-                if (!bombs.length == 1) {
+                if (bombs.length < 1 && !pause && time != 0 && !win) {
                     bombs.push(new Bomb(player.x, player.y, tnt));
                 }
                 break;
@@ -215,8 +215,10 @@ function start() {
                                 paints.gameOverScreen(time);
                             }
                         }, 1000)
+                        bg.play();
                     } else {
                         clearInterval(timer);
+                        bg.pause();
                     }
                     paints.pauseScreen();
                 }
