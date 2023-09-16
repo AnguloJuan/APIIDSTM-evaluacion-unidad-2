@@ -80,7 +80,7 @@ let paints = {
         ctx.drawImage(img, x, y, w, h);
         ctx.closePath();
     },
-    explosion(x, y, w, h) {
+    explosion(x, y) {
         ctx.beginPath();
         ctx.fillStyle = "#f00"
         ctx.fillRect(x, y - 50, 40, 140);
